@@ -2,6 +2,7 @@ package com.codeu.team51.crawl;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.StrictMode;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +15,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.support.v7.widget.SearchView;
 
+import com.codeu.team51.crawl.Redis.Search;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class SearchActivity extends AppCompatActivity {
@@ -57,18 +61,23 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 Log.d("Crawl", "Search!");
-                urls.add("url1");
-                urls.add("url2");
-                urls.add("url3");
-                urls.add("url4");
-                urls.add("url5");
 
-                ArrayAdapter<String> adapter =
-                        new ArrayAdapter<String>(SearchActivity.this,
-                                android.R.layout.simple_list_item_1, urls);
-
-                resultsView.setAdapter(adapter);
                 searchView.clearFocus();
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+
+                String[] arr = {query};
+                Search search = new Search(arr);
+                try {
+                    urls = search.performSearch();
+                    ArrayAdapter<String> adapter =
+                            new ArrayAdapter<String>(SearchActivity.this,
+                                    android.R.layout.simple_list_item_1, urls);
+                    resultsView.setAdapter(adapter);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 return true;
             }
 

@@ -1,0 +1,2 @@
+configurations.create("default")
+artifacts.add("default", file('jewelcli-0.8.9.jar'))
